@@ -5,7 +5,7 @@ const cors = require("cors");
 const pool = require("./config/db");
 const authRoutes =  require("./routes/auth.routes");
 const customerRoutes =  require("./routes/customer.routes");
-
+const customerFollowupRoutes = require("./routes/customerFollowup.routes");
 const app = express();
 
 app.use(cors());
@@ -31,6 +31,7 @@ app.get("/db-test", async (req, res) => {
 
 app.use("/api/auth",authRoutes);
 app.use("/api/customers",customerRoutes);
+app.use("/api", customerFollowupRoutes);
 
 app.listen(process.env.PORT, () => {
     console.log(`Server running on port ${process.env.PORT}`);
