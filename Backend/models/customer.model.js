@@ -92,7 +92,63 @@ const Customer = {
     const [rows] = await pool.execute(query, params);
 
     return rows;
-    }
+    },
+
+    async update(id, data) {
+    const {
+        name,
+        mobile,
+        email,
+        business_name,
+        gst_number,
+        customer_type,
+        address,
+        status,
+        follow_up_date,
+        notes
+    } = data;
+
+    const [result] = await pool.execute(
+        `UPDATE customers
+         SET
+            name = ?,
+            mobile = ?,
+            email = ?,
+            business_name = ?,
+            gst_number = ?,
+            customer_type = ?,
+            address = ?,
+            status = ?,
+            follow_up_date = ?,
+            notes = ?
+         WHERE id = ?`,
+        [
+            name,
+            mobile,
+            email,
+            business_name,
+            gst_number,
+            customer_type,
+            address,
+            status,
+            follow_up_date,
+            notes,
+            id
+        ]
+    )
+
+        return result;
+    },
+
+    async delete(id) {
+    const [result] = await pool.execute(
+        `DELETE FROM customers
+         WHERE id = ?`,
+        [id]
+    );
+
+    return result;
+}
 };
 
 module.exports = Customer;

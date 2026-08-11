@@ -98,8 +98,86 @@ const getCustomerById = async (req, res) => {
     }
 };
 
+const updateCustomer = async (req, res) => {
+    try {
+        const {id} = req.params;
+
+        const existingCustomer = await Customer.findById(id);
+
+        if(!existingCustomer){
+            return res.status(404).json({
+                success: false,
+                message: "Customer not found"
+            });
+        }
+
+        const {
+            name,
+            mobile,
+            customer_type
+        } = req.body;
+
+        if(!name || !mobile || !customer_type){
+            return res.status(400).json({
+                success: false,
+                message: "Name, mobile and customer type are required"
+            });
+        }
+
+        await Customer.update(id, req.body);
+
+        const customer  = await Customer.findById(id);
+
+        return res.status(200).json({
+            success: true,
+            message: "Customer updated successfully",
+            customer
+        });
+
+    } catch (error) {
+        console.error("Update customer error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "An error occurred while updating the customer"
+        });
+    }
+};
+
+const deleteCustomer = async (req, res) => {
+    try {
+        const {id} = req.params;
+
+        const existingCustomer = await Customer.findById(id);
+
+        if(!existingCustomer){
+            return res.status(404).json({
+                success: false,
+                message: "Customer not found"
+            });
+        }
+
+        await Customer.delete(id);
+
+        return res.status(200).json({
+            success: true,
+            message: "Customer deleted successfully"
+        });
+
+    } catch (error) {
+        console.error("Delete customer error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "An error occurred while deleting the customer"
+        });
+    }
+};
+
 module.exports = {
     createCustomer,
     getCustomer,
-    getCustomerById
+    getCustomerById,
+    updateCustomer,
+    deleteCustomer
 }
