@@ -60,6 +60,14 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.get("/", (req, res) => {
+    res.json({
+        success: true,
+        message: "CRM Backend API is running",
+        version: "1.0.0"
+    });
+});
+
 app.get("/db-test", async (req, res) => {
     try {
         const [result] = await pool.query("SELECT 1");

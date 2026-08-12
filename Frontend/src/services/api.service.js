@@ -1,6 +1,7 @@
 import { getAccessToken } from './session.service'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000'
+// Remove trailing slash from API base URL to prevent double slashes
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000').replace(/\/$/, '')
 
 export const apiRequest = async (path, options = {}) => {
   const token = getAccessToken()

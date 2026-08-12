@@ -28,6 +28,50 @@ async function initializeDatabase() {
             console.log(`✅ Database '${process.env.DB_NAME}' already exists`);
         }
         
+        // Switch to the database
+        await connection.execute(`USE \`${process.env.DB_NAME}\``);
+        
+        // Create users table if it doesn't exist
+        console.log("📝 Creating users table...");
+        await connection.execute(`
+            CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                role ENUM('admin', 'sales', 'warehouse', 'accounts') NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            )
+        `);
+        console.log("✅ Users table created/verified");
+        
+        // Create other necessary tables
+        await connection.execute(`
+            CREATE TABLE IF NOT EXISTS customers (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255),
+                phone VARCHAR(50),
+                address TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            )
+        `);
+        
+        await connection.execute(`
+            CREATE TABLE IF NOT EXISTS products (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                description TEXT,
+                sku VARCHAR(100) UNIQUE,
+                price DECIMAL(10,2),
+                stock_quantity INT DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            )
+        `);
+        
         await connection.end();
         console.log("🎉 Database initialization complete");
         
