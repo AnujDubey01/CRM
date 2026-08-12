@@ -1,16 +1,75 @@
-# React + Vite
+# OpsFlow Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite frontend for the OpsFlow ERP/CRM dashboard.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Reusable enterprise app shell
+- Responsive desktop/tablet/mobile sidebar behavior
+- Dashboard KPI cards, bar chart, donut chart, low-stock table, and recent activity feed
+- Role-aware navigation using the stored user role
+- Dashboard data hook with real backend integration
+- Clean development fallback when no auth token is present or `VITE_DASHBOARD_USE_MOCK=true`
+- Loading skeletons, inline retry state, and empty states
 
-## React Compiler
+## Environment
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Create a `.env` file from `.env.example`:
 
-## Expanding the ESLint configuration
+```env
+VITE_API_BASE_URL=http://127.0.0.1:8000
+VITE_DASHBOARD_USE_MOCK=false
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Run
+
+```bash
+npm install
+npm run dev
+```
+
+Production build:
+
+```bash
+npm run build
+```
+
+Lint:
+
+```bash
+npm run lint
+```
+
+## Backend Endpoints Used
+
+- `GET /api/dashboard`
+- `GET /api/dashboard/low-stock`
+
+When a valid token is present in local storage under `token`, `authToken`, or `accessToken`, requests include:
+
+```http
+Authorization: Bearer <token>
+```
+
+## Local Storage Session Support
+
+The dashboard reads the user from the first available key:
+
+- `user`
+- `authUser`
+- `currentUser`
+
+If no session exists, the frontend uses a clearly separated development preview mode with demo user data and mock dashboard content.
+
+## Current Route Structure
+
+- `/dashboard`
+- `/reports`
+- `/customers`
+- `/products`
+- `/inventory`
+- `/challans`
+- `/system`
+- `/settings`
+
+Only the dashboard page is fully implemented in this pass. The rest already use the shared shell and navigation so future pages can be added without redesigning the layout.

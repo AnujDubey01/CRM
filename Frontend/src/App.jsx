@@ -1,121 +1,156 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useEffect, useState } from 'react'
 import './App.css'
+import AppShell from './components/layout/AppShell'
+import Customers from './pages/Customers'
+import Dashboard from './pages/Dashboard'
+import PlaceholderPage from './pages/PlaceholderPage'
+import Products from './pages/Products'
+import SalesChallans from './pages/SalesChallans'
+import Login from './pages/Login'
+import CustomerDetails from './pages/CustomerDetails'
+import { Inventory, Operations, Reports, Settings, System } from './pages/OperationsPages'
+import { getCurrentUser } from './services/session.service'
+
+const routeMeta = {
+  '/login': { page: 'login' },
+  '/dashboard': {
+    section: 'Overview',
+    title: 'Dashboard Overview',
+    page: 'dashboard',
+  },
+  '/reports': {
+    section: 'Overview',
+    title: 'Reports',
+    page: 'reports',
+  },
+  '/customers': {
+    section: 'Operations',
+    title: 'Customers',
+    page: 'customers',
+  },
+  '/products': {
+    section: 'Operations',
+    title: 'Products',
+    page: 'products',
+  },
+  '/operations': {
+    section: 'Operations',
+    title: 'Operations',
+    page: 'operations',
+  },
+  '/inventory': {
+    section: 'Operations',
+    title: 'Inventory',
+    page: 'inventory',
+  },
+  '/challans': {
+    section: 'Operations',
+    title: 'Sales Challans',
+    page: 'challans',
+  },
+  '/system': {
+    section: 'Administration',
+    title: 'System',
+    page: 'system',
+  },
+  '/settings': {
+    section: 'Administration',
+    title: 'Settings',
+    page: 'settings',
+  },
+}
+
+const normalizePath = (pathname) => {
+  if (!pathname || pathname === '/') {
+    return '/login'
+  }
+
+  const exactPath = Object.keys(routeMeta).find(
+    (candidatePath) =>
+      pathname === candidatePath || pathname.startsWith(`${candidatePath}/`),
+  )
+
+  return exactPath || '/dashboard'
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [pathname, setPathname] = useState(() => window.location.pathname || '/')
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [user, setUser] = useState(() => getCurrentUser())
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setPathname(window.location.pathname || '/')
+      setSidebarOpen(false)
+    }
+
+    const handleStorage = () => {
+      setUser(getCurrentUser())
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    window.addEventListener('storage', handleStorage)
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+      window.removeEventListener('storage', handleStorage)
+    }
+  }, [])
+
+  const navigate = (nextPath) => {
+    if (nextPath === pathname) {
+      setSidebarOpen(false)
+      return
+    }
+
+    window.history.pushState({}, '', nextPath)
+    setPathname(nextPath)
+    setSidebarOpen(false)
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('authToken')
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('user')
+    localStorage.removeItem('authUser')
+    localStorage.removeItem('currentUser')
+    setUser(getCurrentUser())
+    navigate('/login')
+  }
+
+  const routePath = normalizePath(pathname)
+  const currentRoute = routeMeta[routePath] || routeMeta['/dashboard']
+  const isCustomerDetail = pathname.startsWith('/customers/')
+
+  const pageContent = {
+    customers: isCustomerDetail ? <CustomerDetails onNavigate={navigate} /> : <Customers onOpenCustomer={(id) => navigate(`/customers/${id}`)} />,
+    dashboard: <Dashboard onNavigate={navigate} user={user} />,
+    products: <Products />,
+    challans: <SalesChallans />,
+    login: <Login onLogin={(nextUser) => { setUser({ ...nextUser, firstName: nextUser.name.split(' ')[0], roleLabel: nextUser.role.charAt(0).toUpperCase() + nextUser.role.slice(1).toLowerCase() }); navigate('/dashboard') }} />,
+    inventory: <Inventory />,
+    operations: <Operations />,
+    reports: <Reports />,
+    settings: <Settings />,
+    system: <System user={user} />,
+    placeholder: <PlaceholderPage title={currentRoute.title} user={user} />,
+  }[currentRoute.page]
+
+  if (currentRoute.page === 'login') return pageContent
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <AppShell
+      currentPath={routePath}
+      currentTitle={currentRoute.title}
+      onNavigate={navigate}
+      onLogout={handleLogout}
+      onSidebarToggle={() => setSidebarOpen((previous) => !previous)}
+      sidebarOpen={sidebarOpen}
+      user={user}
+    >
+      {pageContent}
+    </AppShell>
   )
 }
 
