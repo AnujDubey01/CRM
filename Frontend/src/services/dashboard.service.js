@@ -1,7 +1,7 @@
 import { getAccessToken, isUsingDemoSession } from './session.service'
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
+  import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5000'
 
 const shouldUseMockDataMode = () =>
   import.meta.env.VITE_DASHBOARD_USE_MOCK === 'true' || isUsingDemoSession()
