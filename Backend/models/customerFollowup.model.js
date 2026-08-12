@@ -22,7 +22,7 @@ const CustomerFollowup = {
             [
                 customer_id,
                 note,
-                follow_up_date,
+                follow_up_date ?? null,
                 created_by
             ]
         );

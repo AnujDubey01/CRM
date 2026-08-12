@@ -34,14 +34,14 @@ const Customer = {
             [
                 name,
                 mobile,
-                email,
-                business_name,
-                gst_number,
+                email ?? null,
+                business_name ?? null,
+                gst_number ?? null,
                 customer_type,
-                address,
-                status,
-                follow_up_date,
-                notes
+                address ?? null,
+                status ?? "lead",
+                follow_up_date ?? null,
+                notes ?? null
             ]
         );
 
@@ -125,14 +125,14 @@ const Customer = {
         [
             name,
             mobile,
-            email,
-            business_name,
-            gst_number,
+            email ?? null,
+            business_name ?? null,
+            gst_number ?? null,
             customer_type,
-            address,
-            status,
-            follow_up_date,
-            notes,
+            address ?? null,
+            status ?? "lead",
+            follow_up_date ?? null,
+            notes ?? null,
             id
         ]
     )
