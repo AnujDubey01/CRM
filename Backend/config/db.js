@@ -8,8 +8,7 @@ const pool = mysql.createPool({
     database: process.env.DB_NAME,
     port: process.env.DB_PORT || 3306,
     connectionLimit: 10,
-    acquireTimeout: 60000,
-    // Removed invalid options: timeout and reconnect
+    // Removed acquireTimeout as it's not a valid mysql2 option
     ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
