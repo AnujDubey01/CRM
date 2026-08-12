@@ -1,0 +1,26 @@
+{
+  "name": "opsflow-erp-crm",
+  "version": "1.0.0",
+  "description": "Full-stack ERP/CRM system for distribution businesses",
+  "private": true,
+  "scripts": {
+    "install:backend": "cd Backend && npm install",
+    "install:frontend": "cd Frontend && npm install",
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "dev:backend": "cd Backend && npm run dev",
+    "dev:frontend": "cd Frontend && npm run dev",
+    "build:backend": "cd Backend && npm run build",
+    "build:frontend": "cd Frontend && npm run build",
+    "build:all": "npm run build:backend && npm run build:frontend",
+    "start:backend": "cd Backend && npm start",
+    "start:frontend": "cd Frontend && npm run preview",
+    "test:backend": "cd Backend && npm run test:smoke"
+  },
+  "keywords": ["erp", "crm", "nodejs", "react", "mysql", "express"],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/opsflow-erp-crm.git"
+  }
+}
