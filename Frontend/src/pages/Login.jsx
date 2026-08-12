@@ -115,12 +115,7 @@ function Login({ onLogin }) {
           {error && <p className="login-page__error" role="alert">{error}</p>}
           <button className="login-page__submit" type="submit" disabled={isSubmitting}>{isSubmitting ? (isSignup ? 'Creating account...' : 'Signing in...') : (isSignup ? 'Create Account' : 'Sign In')}</button>
 
-          {!isSignup && (
-            <>
-              <div className="login-page__divider"><span>or continue with</span></div>
-              <div className="login-page__providers"><button type="button"><span>□</span>Google</button><button type="button"><span>▦</span>Microsoft</button></div>
-            </>
-          )}
+
 
           <p className="login-page__request">{isSignup ? 'Already have an account?' : "Don't have an account?"} <button type="button" onClick={switchMode}>{isSignup ? 'Sign in' : 'Create account'}</button></p>
         </form>

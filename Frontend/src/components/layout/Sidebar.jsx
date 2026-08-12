@@ -29,7 +29,6 @@ const getInitials = (name) =>
 
 function Sidebar({ currentPath, onNavigate, onLogout, sidebarOpen, user }) {
   const visiblePaths = roleVisibility[user.role?.toLowerCase()] ?? null
-  const showSignOutOnly = currentPath === '/customers'
 
   return (
     <>
@@ -69,16 +68,14 @@ function Sidebar({ currentPath, onNavigate, onLogout, sidebarOpen, user }) {
             })}
         </nav>
 
-        <div className={`sidebar__footer${showSignOutOnly ? ' sidebar__footer--signout' : ''}`}>
-          {showSignOutOnly ? null : (
-            <div className="sidebar__user">
-              <div className="sidebar__avatar">{getInitials(user.name)}</div>
-              <div className="sidebar__user-details">
-                <div className="sidebar__user-name">{user.name}</div>
-                <div className="sidebar__user-role">{user.roleLabel}</div>
-              </div>
+        <div className="sidebar__footer">
+          <div className="sidebar__user">
+            <div className="sidebar__avatar">{getInitials(user.name)}</div>
+            <div className="sidebar__user-details">
+              <div className="sidebar__user-name">{user.name}</div>
+              <div className="sidebar__user-role">{user.roleLabel}</div>
             </div>
-          )}
+          </div>
           <Button
             ariaLabel="Sign out"
             className="sidebar__logout"
@@ -87,9 +84,7 @@ function Sidebar({ currentPath, onNavigate, onLogout, sidebarOpen, user }) {
             onClick={onLogout}
             title="Sign out"
             variant="ghost"
-          >
-            {showSignOutOnly ? 'Sign Out' : null}
-          </Button>
+          />
         </div>
       </aside>
     </>

@@ -11,14 +11,14 @@ const router = express.Router();
 router.get(
     "/",
     authenticate,
-    authorizeRoles("sales", "warehouse"),
+    authorizeRoles("sales", "warehouse", "accounts"),
     getDashboard
 );
 
 router.get(
     "/low-stock",
     authenticate,
-    authorizeRoles("sales", "warehouse"),
+    authorizeRoles("sales", "warehouse", "accounts"),
     getDashboardLowStock
 );
 

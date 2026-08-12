@@ -14,14 +14,14 @@ const {
 
 const router = express.Router();
 
-router.post("/", authenticate, authorizeRoles(), createProduct);
+router.post("/", authenticate, authorizeRoles("sales"), createProduct);
 
-router.get("/", authenticate, authorizeRoles("sales", "warehouse"), getProducts);
-router.get("/low-stock",authenticate, authorizeRoles("sales", "warehouse"), getLowStockProducts);
+router.get("/", authenticate, authorizeRoles("sales", "warehouse", "accounts"), getProducts);
+router.get("/low-stock",authenticate, authorizeRoles("sales", "warehouse", "accounts"), getLowStockProducts);
 
-router.get("/:id", authenticate, authorizeRoles("sales", "warehouse"), getProductById);
+router.get("/:id", authenticate, authorizeRoles("sales", "warehouse", "accounts"), getProductById);
 
-router.put("/:id", authenticate, authorizeRoles(), updateProduct);
+router.put("/:id", authenticate, authorizeRoles("sales"), updateProduct);
 
 router.delete("/:id", authenticate, authorizeRoles(), deleteProduct);
 

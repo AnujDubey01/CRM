@@ -32,7 +32,7 @@ function ProductImage() {
   )
 }
 
-function Products() {
+function Products({ user }) {
   const [products, setProducts] = useState([])
   const [search, setSearch] = useState('')
   const [form, setForm] = useState(blankProduct)
@@ -41,6 +41,11 @@ function Products() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+
+  // Role-based permissions
+  const userRole = user?.role?.toLowerCase()
+  const canCreateEdit = userRole === 'admin' || userRole === 'sales'
+  const canDelete = userRole === 'admin'
 
   const loadProducts = async (term = search) => {
     setLoading(true)
@@ -143,7 +148,7 @@ function Products() {
         </div>
         <div className="products-page__actions">
           <Button icon="download" iconPosition="start" variant="secondary" onClick={exportProducts}>Export</Button>
-          <Button icon="plus" iconPosition="start" variant="primary" onClick={openCreate}>Add Product</Button>
+          {canCreateEdit && <Button icon="plus" iconPosition="start" variant="primary" onClick={openCreate}>Add Product</Button>}
         </div>
       </div>
 
@@ -175,7 +180,11 @@ function Products() {
                     <td><div className={`products-page__stock products-page__stock--${status.tone}`}><div className="products-page__stock-meta"><strong>{product.current_stock}</strong><span>{product.warehouse}</span></div><div className="products-page__stock-track"><span style={{ width: `${stockPercent}%` }} /></div></div></td>
                     <td>{product.minimum_stock}</td>
                     <td><span className={`products-page__status products-page__status--${status.tone}`}><span aria-hidden="true" />{status.label}</span></td>
-                    <td><div className="table-actions"><button type="button" onClick={() => openEdit(product)}>Edit</button><button type="button" onClick={() => removeProduct(product)}>Delete</button></div></td>
+                    <td><div className="table-actions">
+                      {canCreateEdit && <button type="button" onClick={() => openEdit(product)}>Edit</button>}
+                      {canDelete && <button type="button" onClick={() => removeProduct(product)}>Delete</button>}
+                      {!canCreateEdit && !canDelete && <span style={{ color: '#9ca3af', fontSize: '0.75rem' }}>View only</span>}
+                    </div></td>
                   </tr>
                 )
               })}

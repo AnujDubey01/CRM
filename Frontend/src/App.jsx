@@ -126,7 +126,7 @@ function App() {
   const pageContent = {
     customers: isCustomerDetail ? <CustomerDetails onNavigate={navigate} /> : <Customers onOpenCustomer={(id) => navigate(`/customers/${id}`)} />,
     dashboard: <Dashboard onNavigate={navigate} user={user} />,
-    products: <Products />,
+    products: <Products user={user} />,
     challans: <SalesChallans />,
     login: <Login onLogin={(nextUser) => { setUser({ ...nextUser, firstName: nextUser.name.split(' ')[0], roleLabel: nextUser.role.charAt(0).toUpperCase() + nextUser.role.slice(1).toLowerCase() }); navigate('/dashboard') }} />,
     inventory: <Inventory />,
