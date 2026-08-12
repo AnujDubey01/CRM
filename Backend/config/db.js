@@ -8,19 +8,37 @@ const pool = mysql.createPool({
     database: process.env.DB_NAME,
     port: process.env.DB_PORT || 3306,
     connectionLimit: 10,
-    // Removed acquireTimeout as it's not a valid mysql2 option
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    // Add connection settings for better reliability
+    waitForConnections: true,
+    queueLimit: 0
 });
 
-pool.getConnection()
-    .then(connection => {
-        console.log(`✅ MySQL Connected to ${process.env.DB_HOST}:${process.env.DB_PORT || 3306}`);
-        connection.release();
-    })
-    .catch(error => {
-        console.log("❌ MySQL Connection Failed");
-        console.log(`Host: ${process.env.DB_HOST}:${process.env.DB_PORT || 3306}`);
-        console.log(error.message);
-    });
+// Test connection with retry logic
+async function testConnection(retries = 3) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            const connection = await pool.getConnection();
+            console.log(`✅ MySQL Connected to ${process.env.DB_HOST}:${process.env.DB_PORT || 3306}`);
+            connection.release();
+            return;
+        } catch (error) {
+            console.log(`❌ MySQL Connection Failed (attempt ${i + 1}/${retries})`);
+            console.log(`Host: ${process.env.DB_HOST}:${process.env.DB_PORT || 3306}`);
+            console.log(`Database: ${process.env.DB_NAME}`);
+            console.log(`Error: ${error.message}`);
+            
+            if (i === retries - 1) {
+                console.log("🔄 All connection attempts failed. The app will continue but database operations may fail.");
+                return;
+            }
+            
+            // Wait before retrying
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+    }
+}
+
+testConnection();
 
 module.exports = pool;
