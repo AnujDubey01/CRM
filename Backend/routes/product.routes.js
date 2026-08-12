@@ -7,7 +7,8 @@ const {
     getProducts,
     getProductById,
     updateProduct,
-    deleteProduct
+    deleteProduct ,
+    getLowStockProducts
 } = require("../controllers/product.controller");
 
 const router = express.Router();
@@ -15,6 +16,7 @@ const router = express.Router();
 router.post("/", authenticate, createProduct);
 
 router.get("/", authenticate, getProducts);
+router.get("/low-stock",authenticate, getLowStockProducts);
 
 router.get("/:id", authenticate, getProductById);
 

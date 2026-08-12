@@ -130,6 +130,29 @@ const Product = {
         );
 
         return result;
+    },
+
+    async updateStock(id, newStock) {
+
+    const [result] = await pool.execute(
+        `UPDATE products
+         SET current_stock = ?
+         WHERE id = ?`,
+        [newStock, id]
+    );
+
+    return result;
+    },
+
+    async findLowStock() {
+    const [rows] = await pool.execute(
+        `SELECT *
+         FROM products
+         WHERE current_stock <= minimum_stock
+         ORDER BY current_stock ASC`
+    );
+
+    return rows;
     }
 };
 

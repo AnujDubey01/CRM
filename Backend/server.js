@@ -7,6 +7,7 @@ const authRoutes =  require("./routes/auth.routes");
 const customerRoutes =  require("./routes/customer.routes");
 const customerFollowupRoutes = require("./routes/customerFollowup.routes");
 const productRoutes = require("./routes/product.routes");
+const stockMovementRoutes = require("./routes/stockMovement.routes");
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use("/api/auth",authRoutes);
 app.use("/api/customers",customerRoutes);
 app.use("/api", customerFollowupRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api", stockMovementRoutes);
 
 app.listen(process.env.PORT, () => {
     console.log(`Server running on port ${process.env.PORT}`);

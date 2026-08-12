@@ -213,10 +213,30 @@ const deleteProduct = async (req, res) => {
     }
 };
 
+const getLowStockProducts = async (req, res) => {
+    try {
+        const products = await Product.findLowStock();
+
+        return res.status(200).json({
+            success: true,
+            products
+        });
+
+    } catch (error) {
+        console.error("Low stock error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "An error occurred while fetching low-stock products"
+        });
+    }
+};
+
 module.exports = {
     createProduct,
     getProducts,
     getProductById,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getLowStockProducts
 };
