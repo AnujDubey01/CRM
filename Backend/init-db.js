@@ -5,35 +5,21 @@ async function initializeDatabase() {
     try {
         console.log("🔄 Initializing database...");
         
-        // Connect without specifying database
+        // Connect directly to the target database
         const connection = await mysql.createConnection({
             host: process.env.DB_HOST,
             port: process.env.DB_PORT,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME, // Connect directly to the database
             ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
         });
         
-        console.log("✅ Connected to MySQL server");
-        
-        // Check if database exists
-        const [databases] = await connection.execute("SHOW DATABASES");
-        const dbExists = databases.some(db => db.Database === process.env.DB_NAME);
-        
-        if (!dbExists) {
-            console.log(`📝 Creating database '${process.env.DB_NAME}'...`);
-            await connection.execute(`CREATE DATABASE \`${process.env.DB_NAME}\``);
-            console.log(`✅ Database '${process.env.DB_NAME}' created successfully`);
-        } else {
-            console.log(`✅ Database '${process.env.DB_NAME}' already exists`);
-        }
-        
-        // Switch to the database
-        await connection.execute(`USE \`${process.env.DB_NAME}\``);
+        console.log(`✅ Connected to MySQL database: ${process.env.DB_NAME}`);
         
         // Create users table if it doesn't exist
         console.log("📝 Creating users table...");
-        await connection.execute(`
+        await connection.query(`
             CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
@@ -46,8 +32,9 @@ async function initializeDatabase() {
         `);
         console.log("✅ Users table created/verified");
         
-        // Create other necessary tables
-        await connection.execute(`
+        // Create customers table
+        console.log("📝 Creating customers table...");
+        await connection.query(`
             CREATE TABLE IF NOT EXISTS customers (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
@@ -58,8 +45,11 @@ async function initializeDatabase() {
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )
         `);
+        console.log("✅ Customers table created/verified");
         
-        await connection.execute(`
+        // Create products table
+        console.log("📝 Creating products table...");
+        await connection.query(`
             CREATE TABLE IF NOT EXISTS products (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
@@ -71,6 +61,7 @@ async function initializeDatabase() {
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )
         `);
+        console.log("✅ Products table created/verified");
         
         await connection.end();
         console.log("🎉 Database initialization complete");
@@ -78,7 +69,9 @@ async function initializeDatabase() {
     } catch (error) {
         console.error("❌ Database initialization failed:");
         console.error(error.message);
-        process.exit(1);
+        
+        // Don't exit the process, let the app continue
+        console.log("⚠️ Continuing without database initialization...");
     }
 }
 
