@@ -1,3 +1,4 @@
+const pool = require("../config/db");
 const Product = require("../models/product.model");
 const StockMovement = require("../models/stockMovement.model");
 
@@ -31,6 +32,7 @@ const stockIn = async (req, res) => {
                 message: "Product not found"
             });
         }
+        await connection.beginTransaction();
 
         // Calculate new stock
         const newStock =
@@ -42,26 +44,70 @@ const stockIn = async (req, res) => {
             newStock
         );
 
-        // Record movement
-        const movementId = await StockMovement.create({
-            product_id: productId,
-            quantity: Number(quantity),
-            movement_type: "IN",
-            reason: reason || "Stock added",
-            created_by: req.user.id
-        });
+        await connection.execute(
+            `UPDATE products
+             SET current_stock = ?
+             WHERE id = ?`,
+            [newStock, productId]
+        );
 
-        const movement =
-            await StockMovement.findById(movementId);
+        const [result] = await connection.execute(
+            `INSERT INTO stock_movements
+            (
+                product_id,
+                quantity,
+                movement_type,
+                reason,
+                created_by
+            )
+            VALUES (?, ?, ?, ?, ?)`,
+            [
+                productId,
+                Number(quantity),
+                "IN",
+                reason || "Stock added",
+                req.user.id
+            ]
+        );
+
+        await connection.commit();
 
         return res.status(201).json({
             success: true,
             message: "Stock added successfully",
             stock: newStock,
-            movement
+            movementId: result.insertId
         });
 
+        // Record movement
+        // const movementId = await StockMovement.create({
+        //     product_id: productId,
+        //     quantity: Number(quantity),
+        //     movement_type: "IN",
+        //     reason: reason || "Stock added",
+        //     created_by: req.user.id
+        // });
+
+        // const movement =
+        //     await StockMovement.findById(movementId);
+
+        // return res.status(201).json({
+        //     success: true,
+        //     message: "Stock added successfully",
+        //     stock: newStock,
+        //     movement
+        // });
+
     } catch (error) {
+
+        // console.error("Stock IN error:", error);
+
+        // return res.status(500).json({
+        //     success: false,
+        //     message: "An error occurred while adding stock"
+        // });
+
+         await connection.rollback();
 
         console.error("Stock IN error:", error);
 
@@ -69,6 +115,8 @@ const stockIn = async (req, res) => {
             success: false,
             message: "An error occurred while adding stock"
         });
+    }  finally {
+        connection.release();
     }
 };
 
@@ -108,42 +156,90 @@ const stockOut = async (req, res) => {
                 message: "Insufficient stock"
             });
         }
+         await connection.beginTransaction();
 
         const newStock =
             product.current_stock - Number(quantity);
 
         // Update product stock
-        await Product.updateStock(
-            productId,
-            newStock
+        // await Product.updateStock(
+        //     productId,
+        //     newStock
+        // );
+
+        // // Record movement
+        // const movementId = await StockMovement.create({
+        //     product_id: productId,
+        //     quantity: Number(quantity),
+        //     movement_type: "OUT",
+        //     reason: reason || "Stock removed",
+        //     created_by: req.user.id
+        // });
+
+        // const movement =
+        //     await StockMovement.findById(movementId);
+
+        // return res.status(201).json({
+        //     success: true,
+        //     message: "Stock removed successfully",
+        //     stock: newStock,
+        //     movement
+        // });
+
+         await connection.execute(
+            `UPDATE products
+             SET current_stock = ?
+             WHERE id = ?`,
+            [newStock, productId]
         );
 
-        // Record movement
-        const movementId = await StockMovement.create({
-            product_id: productId,
-            quantity: Number(quantity),
-            movement_type: "OUT",
-            reason: reason || "Stock removed",
-            created_by: req.user.id
-        });
+        const [result] = await connection.execute(
+            `INSERT INTO stock_movements
+            (
+                product_id,
+                quantity,
+                movement_type,
+                reason,
+                created_by
+            )
+            VALUES (?, ?, ?, ?, ?)`,
+            [
+                productId,
+                Number(quantity),
+                "OUT",
+                reason || "Stock removed",
+                req.user.id
+            ]
+        );
 
-        const movement =
-            await StockMovement.findById(movementId);
+        await connection.commit();
 
         return res.status(201).json({
             success: true,
             message: "Stock removed successfully",
             stock: newStock,
-            movement
+            movementId: result.insertId
         });
 
+
     } catch (error) {
+        // console.error("Stock OUT error:", error);
+
+        // return res.status(500).json({
+        //     success: false,
+        //     message: "An error occurred while removing stock"
+        // });
+
+        await connection.rollback();
+
         console.error("Stock OUT error:", error);
 
         return res.status(500).json({
             success: false,
             message: "An error occurred while removing stock"
         });
+    }  finally {
+        connection.release();
     }
 };
 
