@@ -13,7 +13,50 @@ const dashboardRoutes = require("./routes/dashboard.routes");
 
 const app = express();
 
-app.use(cors());
+// Configure CORS to allow your frontend domains
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        const allowedOrigins = [
+            'http://localhost:5173', // Local Vite dev server
+            'http://localhost:3000', // Alternative local dev port
+            'http://127.0.0.1:5173', // Local Vite with 127.0.0.1
+            process.env.FRONTEND_URL // Environment variable for production frontend
+        ];
+        
+        // Allow all Vercel domains
+        const isVercelDomain = origin.includes('.vercel.app');
+        const isAllowedOrigin = allowedOrigins.includes(origin);
+        
+        if (isAllowedOrigin || isVercelDomain) {
+            return callback(null, true);
+        }
+        
+        // Log blocked origins for debugging
+        console.log('CORS blocked origin:', origin);
+        return callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true, // Allow cookies and auth headers
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+        'Content-Type', 
+        'Authorization', 
+        'X-Requested-With',
+        'Accept',
+        'Origin'
+    ]
+};
+
+app.use(cors(corsOptions));
+
+// Add debugging for CORS issues
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path} - Origin: ${req.headers.origin || 'No Origin'}`);
+    next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
