@@ -8,6 +8,8 @@ const customerRoutes =  require("./routes/customer.routes");
 const customerFollowupRoutes = require("./routes/customerFollowup.routes");
 const productRoutes = require("./routes/product.routes");
 const stockMovementRoutes = require("./routes/stockMovement.routes");
+const challanRoutes = require("./routes/challan.routes");
+const dashboardRoutes = require("./routes/dashboard.routes");
 
 const app = express();
 
@@ -25,10 +27,11 @@ app.get("/db-test", async (req, res) => {
             result
         });
     } catch (error) {
+        console.error("DB test error:", error);
+
         res.status(500).json({
             success: false,
             message: "MySQL connection failed",
-            error: error.message
         });
     }
 });
@@ -38,6 +41,8 @@ app.use("/api/customers",customerRoutes);
 app.use("/api", customerFollowupRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api", stockMovementRoutes);
+app.use("/api/challans", challanRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 app.listen(process.env.PORT, () => {
     console.log(`Server running on port ${process.env.PORT}`);

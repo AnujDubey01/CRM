@@ -20,10 +20,18 @@ const authenticate = (req,res,next) => {
             });
         }
 
-        const decoded = jwt.verify(
-            token, 
-            process.env.JWT_SECRET
-        );
+        const jwtSecret =
+            process.env.JWT_SECRET ||
+            process.env.ACCESS_TOKEN_SECRET;
+
+        if (!jwtSecret) {
+            return res.status(500).json({
+                success: false,
+                message: "JWT secret is not configured"
+            });
+        }
+
+        const decoded = jwt.verify(token, jwtSecret);
 
         req.user = decoded;
 

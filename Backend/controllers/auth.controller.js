@@ -2,6 +2,8 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 
+const VALID_ROLES = ["admin", "sales", "warehouse", "accounts"];
+
 const register = async(req,res) => {
     try {
         const { name, email, password, role } = req.body;
@@ -10,6 +12,13 @@ const register = async(req,res) => {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
+            });
+        }
+
+        if (!VALID_ROLES.includes(role)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid role"
             });
         }
 
@@ -88,7 +97,7 @@ const loginUser = async(req,res) => {
                 id: user.id,
                 role: user.role
             },
-            process.env.JWT_SECRET,
+            process.env.JWT_SECRET || process.env.ACCESS_TOKEN_SECRET,
             {
                 expiresIn: "1h"
             }
